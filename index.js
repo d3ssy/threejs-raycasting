@@ -198,7 +198,69 @@ CameraControls.install( { THREE: subsetOfTHREE } );
 const clock = new Clock();
 const cameraControls = new CameraControls( camera, canvas );
 
+
+
 /*---------------------------------------------------------------------------------------*/
+
+/*Raycasting*/
+//setup helper objects
+const objectsToTest = {
+    [boxMesh1.uuid]: {object: boxMesh1, color: 'orange'},
+    [boxMesh2.uuid]: {object: boxMesh2, color: 'blue'}    
+}
+const objectsArray = Object.values(objectsToTest).map(item=>item.object);
+
+//create raycaster
+const raycaster = new Raycaster();
+
+//holds mouse position
+const mouse = new Vector2();
+
+//holds previously selected object id
+let previousSelectionUuid;
+
+//map screen coordinates to scene coordinates
+//run raycaster on every mouse move
+window.addEventListener('mousemove', (event)=>{
+    mouse.x = (event.clientX / canvas.clientWidth) * 2 - 1;
+    mouse.y = -(event.clientY / canvas.clientHeight) * 2 + 1;    
+
+    //useful function to set origin and direction
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(objectsArray);
+
+    
+    //no intersects, nothing to do
+    if(!intersects.length){
+        resetPreviousSelection();
+        return;
+    };
+    
+    console.log(intersects);
+    
+    //get first intersection object and set its color to yellow
+    const firstIntersection = intersects[0];
+    firstIntersection.object.material.color.set('yellow');
+
+    //set first object uuid to previous selected
+    const isNotPrevious =  previousSelectionUuid !== firstIntersection.object.uuid;
+
+    //first time around
+    if (previousSelectionUuid !== undefined && isNotPrevious)
+    {
+        resetPreviousSelection();
+    }
+    
+    previousSelectionUuid = firstIntersection.object.uuid;
+});
+
+function resetPreviousSelection() {
+    if(previousSelectionUuid === undefined) return;
+    const previousSelected = objectsToTest[previousSelectionUuid];
+    previousSelected.object.material.color.set(previousSelected.color);
+  }
+
+  /*---------------------------------------------------------------------------------------*/
 
 /*Animation Loop*/
 
@@ -209,10 +271,11 @@ function animate(){
     //Update camera controls
     const delta = clock.getDelta();
     cameraControls.update( delta );
-
     renderer.render(scene, camera); //render the scene every frame
     requestAnimationFrame(animate); //request next frame, recursive call
 }
 
 //call to our function will recursively call itself
 animate();
+
+/*---------------------------------------------------------------------------------------*/
