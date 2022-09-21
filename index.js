@@ -120,23 +120,6 @@ const groundColor= 0xb97a20;
 const hemisphereLight = new HemisphereLight(skyColor, groundColor, intensity);
 scene.add(hemisphereLight);
 
-//Directional light, similar to the sun, direction is important.
-
-const dirLight = new DirectionalLight(color, intensity);
-dirLight.position.set(0,2,0);
-scene.add(dirLight);
-
-//PointLight, emits light in all directions from a single point source.
-//The closer it is to an object, the brighter the light.
-const ptLight = new DirectionalLight(color, intensity);
-ptLight.position.set(0,2,0);
-scene.add(ptLight);
-
-//Spotlight, emits a cone of light
-const spotlight = new SpotLight(color, intensity);
-scene.add(spotlight);
-scene.add(spotlight.target)
-
 /*---------------------------------------------------------------------------------------*/
 
 //Set up renderer;
@@ -223,13 +206,6 @@ const cameraControls = new CameraControls( camera, canvas );
 //that it contain a call to the global function requestAnimationFrame().
 //We are going to use this function to rotate the cube continuously.
 function animate(){
-    boxMesh1.rotation.x += 0.01;
-    boxMesh1.rotation.y += 0.01;
-    boxMesh1.rotation.z += 0.01;
-    boxMesh2.rotation.y += 0.01;
-    boxMesh2.rotation.x += 0.01;
-    boxMesh2.rotation.z += 0.01;
-
     //Update camera controls
     const delta = clock.getDelta();
     cameraControls.update( delta );
